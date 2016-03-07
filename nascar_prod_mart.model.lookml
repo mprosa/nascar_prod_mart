@@ -4,13 +4,14 @@
 - include: "*.dashboard.lookml"  # include all the dashboards
 
 - explore: fa_segment_growth_monthly_accrued
-  label: 'Segment Monthly Growth'
+  label: 'Segment Trending'
+  view_label: 'Segment Trending'
   joins:
     - join: d_audience_segment
       type: inner
       relationship: one_to_one
       sql_on: ${fa_segment_growth_monthly_accrued.audience_segment_id}=${d_audience_segment.audience_segment_id}
-      view_label: 'Segment Monthly Growth'
+      view_label: 'Segment Trending'
       fields: [segment_name]
   always_filter:
     d_audience_segment.segment_name: 'Registered Users'

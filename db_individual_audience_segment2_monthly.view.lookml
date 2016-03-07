@@ -10,6 +10,7 @@
     sql: ${TABLE}.master_digital_profile_id
 
   - dimension: month_id
+    view_label: "Month (YYYYMM)"
     type: string
     sql: ${TABLE}.month_id
 
