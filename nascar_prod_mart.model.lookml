@@ -5,7 +5,7 @@
 
 
 - explore: fa_segment_growth_monthly
-  label: 'Segment Monthly Growth'
+  label: 'Segment Trending'
   view_label: 'Segment Trending'  
   joins:
     - join: d_audience_segment
