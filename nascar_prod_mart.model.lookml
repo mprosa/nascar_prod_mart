@@ -1,4 +1,3 @@
-#testing
 - connection: hadoop_mart_prod
 
 - include: "*.view.lookml"       # include all the views
