@@ -17,6 +17,19 @@
   always_filter:
     d_audience_segment.segment_name: 'Registered Users' 
   
+- explore: fa_page_view_content_affinity_by_month
+  fields: [fa_page_view_content_affinity_by_month*,fa_page_view_content_by_month.time_spent_on_page,fa_page_view_content_by_month.page_views,d_digital_profile_gigya*,-d_digital_profile_gigya.master_digital_profile_id]
+  label: Digital - Content Affinity
+  description: Content affinity scores per visitor by content, time, device type, at the monthly and yearly level
+  view_label: Affinity
+  sql_always_where: ${device_group} <>'ALL'
+  joins:
+    - join: d_digital_profile_gigya
+      type: left_outer
+      relationship: many_to_one
+      sql_on: cast(${fa_page_view_content_affinity_by_month.master_digital_profile_id} as bigint)=${d_digital_profile_gigya.master_digital_profile_id}
+      view_label: Individual
+
 
 
 # - explore: additional_features_test_a
