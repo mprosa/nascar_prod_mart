@@ -3,6 +3,175 @@
 - include: "*.view.lookml"       # include all the views
 - include: "*.dashboard.lookml"  # include all the dashboards
 
+    
+- view: sponsorship_crossover
+  derived_table:
+    sql: |
+     select h.*, a_uniques + b_uniques - crossover_uniques_a as combined_uniques
+      from
+      (select * from
+      (select d.a_sponsorship, d.b_sponsorship, crossover_uniques_a, crossover_time_spent_a, crossover_time_spent_b, a_uniques, a_amt_time_spent, b_uniques, b_amt_time_spent
+      from 
+      
+      (select c.a_sponsorship, c.b_sponsorship, count(distinct c.a_master_digital_profile_id) as crossover_uniques_a, sum(c.b_amt_time_spent) as crossover_time_spent_b, sum(c.a_amt_time_spent) as crossover_time_spent_a
+      from
+      (select a.sponsorship as a_sponsorship, b.sponsorship as b_sponsorship, a.master_digital_profile_id as a_master_digital_profile_id, b.master_digital_profile_id as b_master_digital_profile_id, a.amt_time_spent as a_amt_time_spent, b.amt_time_spent as b_amt_time_spent  
+      from 
+      (select sponsorship, master_digital_profile_id, sum(page_views) as page_view, sum(users) as users, sum(amt_time_spent) as amt_time_spent
+      from
+      nascar_analytics.rosa_sponsorship
+      WHERE {% condition date_id %} date_id {% endcondition %}
+      AND {% condition device_group %} device_group {% endcondition %}
+      group by sponsorship, master_digital_profile_id)
+      a
+      full outer join 
+      (select sponsorship, master_digital_profile_id, sum(page_views) as page_view, sum(users) as users, sum(amt_time_spent) as amt_time_spent
+      from
+      nascar_analytics.rosa_sponsorship
+      WHERE {% condition date_id %} date_id {% endcondition %}
+      AND {% condition device_group %} device_group {% endcondition %}
+      group by sponsorship, master_digital_profile_id) b
+      on a.master_digital_profile_id = b.master_digital_profile_id) c
+      group by
+      c.a_sponsorship, c.b_sponsorship) d
+       
+      inner join
+      
+                 (select sponsorship as a_sponsorship, count(distinct master_digital_profile_id) as a_uniques, sum(amt_time_spent) as a_amt_time_spent
+      from
+      nascar_analytics.rosa_sponsorship
+      WHERE {% condition date_id %} date_id {% endcondition %}
+      AND {% condition device_group %} device_group {% endcondition %}
+      group by sponsorship) aa 
+                 on d.a_sponsorship = aa.a_sponsorship
+                 
+                 inner join 
+                 (select sponsorship as b_sponsorship, count(distinct master_digital_profile_id) as b_uniques, sum(amt_time_spent) as b_amt_time_spent
+      from
+      nascar_analytics.rosa_sponsorship
+      WHERE {% condition date_id %} date_id {% endcondition %}
+      AND {% condition device_group %} device_group {% endcondition %}
+      group by sponsorship) bb on d.b_sponsorship = bb.b_sponsorship
+                 
+      ) f
+      
+      join 
+
+      (
+      select 4621365 as total_uniques, 4452127351 as total_time_spent
+      /*select count(distinct master_digital_profile_id) as total_uniques, sum(amt_time_spent_on_pages) as total_time_spent
+      from
+      nascar_mart.fa_session a
+      inner join nascar_mastering.db_digital_profile_master b
+      on a.digital_profile_id = b.digital_profile_id
+      inner join nascar_mart.d_device_type c
+      on a.device_type = c.device_type
+      WHERE c.device_group = 'DESKTOP' and a.session_start_date_id >= 20160501*/
+      ) g
+      ) 
+      
+      h
+
+  suggestions: TRUE
+  fields:
+  
+  - filter: date_id
+    type: number
+    suggestable: FALSE
+
+  - filter: device_group
+    type: string
+
+  - dimension: a_sponsorship
+    type: string
+    sql: ${TABLE}.a_sponsorship
+
+  - dimension: b_sponsorship
+    type: string
+    sql: ${TABLE}.b_sponsorship
+
+  - dimension: a_amt_time_spent
+    type: number
+    sql: ${TABLE}.a_amt_time_spent
+
+  - dimension: b_amt_time_spent
+    type: number
+    sql: ${TABLE}.b_amt_time_spent
+
+  - dimension: crossover_uniques_a
+    type: number
+    sql: ${TABLE}.crossover_uniques_a
+
+  - dimension: crossover_time_spent_a
+    type: number
+    sql: ${TABLE}.crossover_time_spent_a
+    
+  - dimension: crossover_time_spent_b
+    type: number
+    sql: ${TABLE}.crossover_time_spent_b
+
+  - dimension: a_uniques
+    type: number
+    sql: ${TABLE}.a_uniques
+    
+  - dimension: b_uniques
+    type: number
+    sql: ${TABLE}.b_uniques
+    
+  - dimension: combined_uniques
+    type: number
+    sql: ${TABLE}.combined_uniques
+
+  - dimension: total_uniques
+    type: number
+    sql: ${TABLE}.total_uniques
+
+  - dimension: total_time_spent
+    type: number
+    sql: ${TABLE}.total_time_spent
+    
+  - measure: a_amt_time_spent_measure
+    type: avg
+    sql: ${a_amt_time_spent}/60
+
+  - measure: b_amt_time_spent_measure
+    type: sum
+    sql: ${b_amt_time_spent}/60
+    
+  - measure: crossover_uniques_measure_a
+    type: sum
+    sql: ${crossover_uniques_a}
+    
+  - measure: crossover_time_spent_measure_a
+    type: sum
+    sql: ${crossover_time_spent_a}/60
+
+  - measure: crossover_time_spent_measure_b
+    type: sum
+    sql: ${crossover_time_spent_b}/60
+    
+  - measure: a_uniques_measure
+    type: avg
+    sql: ${a_uniques}
+
+  - measure: b_uniques_measure
+    type: sum
+    sql: ${b_uniques}
+    
+  - measure: combined_uniques_measure
+    type: sum
+    sql: ${combined_uniques}
+
+  - measure: total_uniques_measure
+    type: sum
+    sql: ${total_uniques}
+    
+  - measure: total_time_spent_measure
+    type: sum
+    sql: ${total_time_spent}/60
+    
+- explore: sponsorship_crossover
+
 
 - explore: fa_segment_growth_monthly
   label: 'Segment Trending'
