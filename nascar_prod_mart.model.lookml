@@ -186,6 +186,7 @@
   always_filter:
     d_audience_segment.segment_name: 'Registered Users' 
   
+
 - explore: fa_page_view_content_affinity_by_month
   fields: [fa_page_view_content_affinity_by_month*,fa_page_view_content_by_month.time_spent_on_page,fa_page_view_content_by_month.page_views,d_digital_profile_gigya*,-d_digital_profile_gigya.master_digital_profile_id]
   label: Digital - Content Affinity
@@ -193,12 +194,22 @@
   view_label: Affinity
   sql_always_where: ${device_group} <>'ALL'
   joins:
+    - join: fa_page_view_content_by_month
+      type: inner
+      relationship: one_to_one
+      sql_on: ${fa_page_view_content_affinity_by_month.master_digital_profile_id}=${fa_page_view_content_by_month.master_digital_profile_id} 
+              and ${fa_page_view_content_affinity_by_month.content_tag}=${fa_page_view_content_by_month.content_tag}
+              and ${fa_page_view_content_affinity_by_month.device_group}=${fa_page_view_content_by_month.device_group}
+              and ${fa_page_view_content_affinity_by_month.date_yyyymm}=${fa_page_view_content_by_month.date_yyyymm}
+              and ${fa_page_view_content_affinity_by_month.registered_flg}=${fa_page_view_content_by_month.registered_flg}
+      view_label: Affinity
     - join: d_digital_profile_gigya
       type: left_outer
       relationship: many_to_one
       sql_on: cast(${fa_page_view_content_affinity_by_month.master_digital_profile_id} as bigint)=${d_digital_profile_gigya.master_digital_profile_id}
       view_label: Individual
-
+      
+  
 
 
 # - explore: additional_features_test_a

@@ -1,5 +1,5 @@
 - view: fa_page_view_content_affinity_by_month
-  sql_table_name: nascar_mart.fa_page_view_content_affinity_by_month
+  suggestions: false
   fields:
 
   - dimension: annual_affinity_score
@@ -10,9 +10,9 @@
     type: string
     sql: ${TABLE}.content_tag
 
-  - dimension: dataset_instance_id
-    type: number
-    sql: ${TABLE}.dataset_instance_id
+  #- dimension: dataset_instance_id
+  #  type: number
+  #  sql: ${TABLE}.dataset_instance_id
 
   - dimension: date_yyyymm
     type: number
@@ -30,20 +30,11 @@
     type: number
     sql: ${TABLE}.monthly_affinity_score
 
-  - dimension: page_views
-    type: number
-    sql: ${TABLE}.page_views
-
   - dimension: registered_flg
     type: number
     sql: ${TABLE}.registered_flg
 
-  - dimension: time_spent_on_page
-    type: number
-    sql: ${TABLE}.time_spent_on_page
-
   - measure: audience_count
     type: count_distinct
     sql: ${TABLE}.master_digital_profile_id
-    drill_fields: []
-
+    drill_fields: [master_digital_profile_id,profile_email]
